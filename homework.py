@@ -32,7 +32,7 @@ class Calculator:
                           if end_week.date() <= record.date <= today.date())
         return week_amount
 
-    def remainde(self):
+    def remained(self):
         """Остаток."""
 
         return self.limit - self.get_today_stats()
@@ -56,7 +56,7 @@ class CashCalculator(Calculator):
             return 'Некорректное значение'
         if self.get_today_stats() == self.limit:
             return 'Денег нет, держись'
-        remained = self.remainde()
+        remained = self.remained()
         coin, rate = money[currency]
         cash = abs(round(remained / rate, 2))
         if self.get_today_stats() < self.limit:
@@ -70,7 +70,7 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         """Остаток калорий"""
 
-        remained = self.remainde()
+        remained = self.remained()
         if self.get_today_stats() < self.limit:
             return ('Сегодня можно съесть что-нибудь ещё, '
                     f'но с общей калорийностью не более {remained} '
