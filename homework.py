@@ -18,21 +18,21 @@ class Calculator:
     def get_today_stats(self):
         """Суточная трата."""
 
-        today = dt.datetime.today()
+        today = dt.date.today()
         today_amount = sum(record.amount for record in self.records
-                           if record.date == today.date())
+                           if record.date == today)
         return today_amount
 
     def get_week_stats(self):
         """Траты за неделю."""
 
-        today = dt.datetime.today()
+        today = dt.date.today()
         end_week = today - dt.timedelta(days=7)
         week_amount = sum(record.amount for record in self.records
-                          if end_week.date() <= record.date <= today.date())
+                          if end_week <= record.date <= today)
         return week_amount
 
-    def remained(self):
+    def get_remained(self):
         """Остаток."""
 
         return self.limit - self.get_today_stats()
@@ -54,12 +54,12 @@ class CashCalculator(Calculator):
         }
         if currency not in money:
             return 'Некорректное значение'
-        if self.get_today_stats() == self.limit:
+        remained = self.get_remained()
+        if remained == 0:
             return 'Денег нет, держись'
-        remained = self.remained()
         coin, rate = money[currency]
         cash = abs(round(remained / rate, 2))
-        if self.get_today_stats() < self.limit:
+        if remained > 0:
             return f'На сегодня осталось {cash} {coin}'
         return f'Денег нет, держись: твой долг - {cash} {coin}'
 
@@ -70,12 +70,12 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         """Остаток калорий"""
 
-        remained = self.remained()
-        if self.get_today_stats() < self.limit:
-            return ('Сегодня можно съесть что-нибудь ещё, '
-                    f'но с общей калорийностью не более {remained} '
-                    'кКал')
-        return 'Хватит есть!'
+        remained = self.get_remained()
+        if remained <= 0:
+            return 'Хватит есть!'
+        return ('Сегодня можно съесть что-нибудь ещё, '
+                f'но с общей калорийностью не более {remained} '
+                'кКал')
 
 
 class Record:
@@ -88,4 +88,4 @@ class Record:
         if date is not None:
             self.date = dt.datetime.strptime(date, FORMAT).date()
         else:
-            self.date = dt.datetime.now().date()
+            self.date = dt.date.today()
